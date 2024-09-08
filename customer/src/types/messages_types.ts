@@ -4,3 +4,7 @@ export const Messages = {
   UPDATE_PASSWORD: 'updatePassword',
   UPDATE_CUSTOMER: 'updateCustomer',
 }
+
+export const MessagesAuth = {
+  VERIFY_TOKEN: 'verifyToken',
+}

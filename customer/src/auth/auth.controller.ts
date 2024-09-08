@@ -1,14 +1,27 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  NotFoundException,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { UserDto } from './dto/user.dto'
 import { AuthService } from './auth.service'
 import { SomeService } from 'src/utils/someService'
 import { LoginUserDto } from './dto/login-user.dto'
+import { MessagePattern } from '@nestjs/microservices'
+import { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { MessagesAuth } from 'src/types'
+import { User } from 'src/interfaces'
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private someService: SomeService,
+    private jwt: JwtService,
+    private configService: ConfigService,
   ) {}
 
   @Post('register')
@@ -47,6 +60,22 @@ export class AuthController {
     return {
       token,
       id: user._id,
+    }
+  }
+
+  @MessagePattern(MessagesAuth.VERIFY_TOKEN)
+  async verifyToken(tokenParam: { token: string }): Promise<User> {
+    const { token } = tokenParam
+
+    if (!token) throw new UnauthorizedException()
+    try {
+      const payload = await this.jwt.verifyAsync(token, {
+        secret: this.configService.get('SECRET_KEY'),
+      })
+
+      return payload
+    } catch {
+      throw new UnauthorizedException()
     }
   }
 }
