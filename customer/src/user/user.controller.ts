@@ -1,57 +1,50 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Put,
-  UseGuards,
-} from '@nestjs/common'
 import { UserService } from './user.service'
-import { AuthGuard } from 'src/auth/guards/auth.guard'
-import { UpdatePasswordDto, UserDecorator } from './dto/'
-import { User } from './decorators/get-user'
-import { SomeService } from 'src/utils/someService'
+import { SomeService } from '../utils/someService'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { Controller } from '@nestjs/common'
+import { MessagePattern } from '@nestjs/microservices'
+import { Messages } from '../types/messages_types'
 
-@UseGuards(AuthGuard)
-@Controller('user')
+@Controller()
 export class UserController {
   constructor(
     private userService: UserService,
     private someService: SomeService,
   ) {}
 
-  @Get()
+  @MessagePattern(Messages.GET_ALL)
   async getAll() {
     return await this.userService.findAll()
   }
 
-  @Get(':id')
-  async getCustomer(@Param('id') id: string) {
+  @MessagePattern(Messages.GET_CUSTOMER)
+  async getCustomer(getParams: { id: string }) {
+    const { id } = getParams
+
     return await this.userService.Customer(id)
   }
 
-  @Put('change-pass')
-  async updatePassword(
-    @Body() password: UpdatePasswordDto,
-    @User() user: UserDecorator,
-  ) {
-    const salt = await this.userService.Customer(user.id, 'salt')
+  @MessagePattern(Messages.UPDATE_PASSWORD)
+  async updatePassword(updatePassParams: { id: string; password: string }) {
+    const { id, password } = updatePassParams
+
+    const salt = await this.userService.Customer(id, 'salt')
 
     const newPassword = await this.someService.GeneratePassword(
-      password.password,
+      password,
       salt.salt,
     )
 
-    return await this.userService.changePassowrd(user.id, newPassword)
+    return await this.userService.changePassowrd(id, newPassword)
   }
 
-  @Patch()
-  async updateCustomer(
-    @Body() updateUser: UpdateUserDto,
-    @User('id') id: string,
-  ) {
+  @MessagePattern(Messages.UPDATE_CUSTOMER)
+  async updateCustomer(updateCustomerParams: {
+    updateUser: UpdateUserDto
+    id: string
+  }) {
+    const { id, updateUser } = updateCustomerParams
+
     return this.userService.updateCustomer(id, updateUser)
   }
 }
