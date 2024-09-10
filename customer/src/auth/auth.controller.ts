@@ -23,17 +23,31 @@ export class AuthController {
   ) {}
 
   @MessagePattern(MessagesAuth.REGISTER)
-  async createCustomer(@Body() userDto: UserDto) {
-    const salt = await this.someService.GenerateSalt()
+  async createCustomer(@Body() userDto: UserDto): Promise<IResponse<User>> {
+    try {
+      const salt = await this.someService.GenerateSalt()
 
-    const hashedPassword = await this.someService.GeneratePassword(
-      userDto.password,
-      salt,
-    )
+      const hashedPassword = await this.someService.GeneratePassword(
+        userDto.password,
+        salt,
+      )
 
-    userDto.password = hashedPassword
+      userDto.password = hashedPassword
 
-    return await this.authService.Create({ ...userDto, salt })
+      const newCustomer = await this.authService.Create({ ...userDto, salt })
+
+      return await this.someService.FormateData<User>({
+        data: newCustomer,
+        message: 'NEW_CUSTOMER_CREATED',
+        status: HttpStatus.CREATED,
+      })
+    } catch (e) {
+      return await this.someService.FormateData({
+        error: true,
+        status: HttpStatus.BAD_REQUEST,
+        message: e.message,
+      })
+    }
   }
 
   @MessagePattern(MessagesAuth.LOGIN)

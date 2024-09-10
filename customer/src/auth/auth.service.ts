@@ -15,8 +15,8 @@ export class AuthService {
   async Create(userDto: CreateUserDto) {
     try {
       return await this.UserModel.create({ ...userDto })
-    } catch {
-      throw new BadRequestException()
+    } catch (e) {
+      throw new BadRequestException(e.message)
     }
   }
 
