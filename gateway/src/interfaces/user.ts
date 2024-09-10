@@ -3,5 +3,5 @@ export interface User {
   user: string
   name: string
   type: string
-  orders: Array<any>
+  orders?: Array<any>
 }

@@ -9,7 +9,7 @@ import { Reflector } from '@nestjs/core'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
 import { User } from 'src/interfaces'
-import { MessagesAuth, messagesCustomer } from 'src/types'
+import { MessagesAuth } from 'src/types'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -37,13 +37,7 @@ export class AuthGuard implements CanActivate {
         this.customerServiceClient.send(MessagesAuth.VERIFY_TOKEN, { token }),
       )
 
-      const user = await firstValueFrom(
-        this.customerServiceClient.send(messagesCustomer.GET_CUSTOMER, {
-          id: payload._id,
-        }),
-      )
-
-      request.user = user
+      request.user = payload
 
       return true
     } catch {

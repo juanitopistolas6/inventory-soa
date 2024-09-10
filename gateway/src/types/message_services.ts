@@ -7,4 +7,6 @@ export const messagesCustomer = {
 
 export const MessagesAuth = {
   VERIFY_TOKEN: 'verifyToken',
+  LOGIN: 'login',
+  REGISTER: 'register',
 }

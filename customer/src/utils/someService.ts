@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { HttpStatus, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
+import { IResponse, FormateDataParams } from '../interfaces'
 
 @Injectable()
 export class SomeService {
@@ -27,5 +28,18 @@ export class SomeService {
     return await jwt.sign(payload, this.Config.get('SECRET_KEY'), {
       expiresIn: '1d',
     })
+  }
+
+  async FormateData<D>({
+    data,
+    message,
+    status = HttpStatus.OK,
+    error = false,
+  }: FormateDataParams<D>): Promise<IResponse<D>> {
+    return {
+      status,
+      message,
+      data: error ? null : data,
+    }
   }
 }

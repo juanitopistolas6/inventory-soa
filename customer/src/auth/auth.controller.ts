@@ -1,19 +1,17 @@
 import {
   Body,
   Controller,
-  NotFoundException,
-  Post,
+  HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common'
-import { UserDto } from './dto/user.dto'
+import { UserDto, LoginUserDto } from './dto/'
 import { AuthService } from './auth.service'
-import { SomeService } from 'src/utils/someService'
-import { LoginUserDto } from './dto/login-user.dto'
+import { SomeService } from '../utils/someService'
 import { MessagePattern } from '@nestjs/microservices'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { MessagesAuth } from 'src/types'
-import { User } from 'src/interfaces'
+import { MessagesAuth } from '../types'
+import { IResponse, token, User } from '../interfaces'
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +22,7 @@ export class AuthController {
     private configService: ConfigService,
   ) {}
 
-  @Post('register')
+  @MessagePattern(MessagesAuth.REGISTER)
   async createCustomer(@Body() userDto: UserDto) {
     const salt = await this.someService.GenerateSalt()
 
@@ -38,8 +36,8 @@ export class AuthController {
     return await this.authService.Create({ ...userDto, salt })
   }
 
-  @Post('login')
-  async login(@Body() userDto: LoginUserDto) {
+  @MessagePattern(MessagesAuth.LOGIN)
+  async login(userDto: LoginUserDto): Promise<IResponse<token>> {
     const user = await this.authService.findUser(userDto.user)
 
     const isUser = await this.someService.VerifyPassword(
@@ -48,7 +46,12 @@ export class AuthController {
       user.salt,
     )
 
-    if (!isUser) throw new NotFoundException()
+    if (!user || !isUser)
+      return await this.someService.FormateData<null>({
+        error: true,
+        message: 'NOT_FOUND_ERROR',
+        status: HttpStatus.NOT_FOUND,
+      })
 
     const token = await this.someService.GenerateSignature({
       id: user._id,
@@ -57,25 +60,39 @@ export class AuthController {
       type: user.type,
     })
 
-    return {
-      token,
-      id: user._id,
-    }
+    return await this.someService.FormateData<token>({
+      data: {
+        id: user._id,
+        token,
+      },
+      message: 'LOGIN_TOKEN_GENERATED',
+    })
   }
 
   @MessagePattern(MessagesAuth.VERIFY_TOKEN)
-  async verifyToken(tokenParam: { token: string }): Promise<User> {
+  async verifyToken(tokenParam: { token: string }): Promise<IResponse<User>> {
     const { token } = tokenParam
 
     if (!token) throw new UnauthorizedException()
     try {
-      const payload = await this.jwt.verifyAsync(token, {
+      const payload: token = await this.jwt.verifyAsync(token, {
         secret: this.configService.get('SECRET_KEY'),
       })
 
-      return payload
+      const user = await this.authService.findUserById(payload.id)
+
+      delete user.orders
+
+      return await this.someService.FormateData({
+        data: user,
+        message: 'TOKEN_VERIFIED_SUCCESFULLY',
+      })
     } catch {
-      throw new UnauthorizedException()
+      return await this.someService.FormateData({
+        error: true,
+        message: 'ERROR_VERIFYING_TOKEN',
+        status: HttpStatus.UNAUTHORIZED,
+      })
     }
   }
 }

@@ -27,4 +27,12 @@ export class AuthService {
 
     return userFound
   }
+
+  async findUserById(id: string) {
+    const userFound = await this.UserModel.findById(id)
+
+    if (!userFound) throw new NotFoundException()
+
+    return userFound
+  }
 }

@@ -24,6 +24,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @Authorization(true)
   async getCustomer(@Param('id') id: string) {
     return await firstValueFrom(
       this.customerServiceClient.send(messagesCustomer.GET_CUSTOMER, { id }),
@@ -31,6 +32,7 @@ export class UserController {
   }
 
   @Put('updatePassword')
+  @Authorization(true)
   async updatePassword(@GetUser() user: User, updatePassword: UpdatePassword) {
     return this.customerServiceClient.send(messagesCustomer.UPDATE_CUSTOMER, {
       id: user._id,
