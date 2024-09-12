@@ -52,7 +52,7 @@ export class UserController {
     return customerResponse
   }
 
-  @Put('updatePassword')
+  @Put('update-password')
   @Authorization(true)
   async updatePassword(
     @GetUser() user: User,

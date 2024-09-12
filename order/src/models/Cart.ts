@@ -9,7 +9,7 @@ export interface ICartSqueme extends mongoose.Document {
   cart: IProductSqueme[]
 }
 
-export const CartSquema = new Schema(
+export const CartSchema = new Schema(
   {
     idCustomer: { type: String, unique: true, required: true },
     cart: [
