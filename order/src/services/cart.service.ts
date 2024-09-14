@@ -25,10 +25,14 @@ export class CartService {
     }
   }
 
+  async CreateCart(idCustomer: string, products?: IProductSqueme) {
+    return await this.cartModel.create({ idCustomer, cart: products })
+  }
+
   async ManageCart(id: string, product: IProductSqueme, action: manageActions) {
     const cart = await this.cartModel.findOne({ idCustomer: id })
 
-    if (!cart) throw new NotFoundException()
+    if (!cart) return await this.CreateCart(id, product)
 
     const itemFound = cart.cart.find(
       (product) => product.product._id.toString() === product.product._id,

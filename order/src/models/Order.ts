@@ -5,6 +5,7 @@ const Schema = mongoose.Schema
 
 export interface IOrderScheme extends mongoose.Document {
   _id: string
+  userId: string
   amount: number
   items: IProductSqueme[]
 }
