@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common'
-import { UserController } from './user.controller'
 import { ClientsModule, Transport } from '@nestjs/microservices'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AuthGuard } from './guards/auth.guard'
-import { AuthController } from './auth.controller'
+import { AuthController, UserController } from './controllers'
 
 @Module({
   imports: [
@@ -18,6 +17,20 @@ import { AuthController } from './auth.controller'
           options: {
             host: 'localhost',
             port: configService.get<number>('CUSTOMER_PORT'),
+          },
+        }),
+      },
+    ]),
+    ClientsModule.registerAsync([
+      {
+        name: 'SHOPPING_SERVICE',
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: 'localhost',
+            port: configService.get<number>('SHOPPING_PORT'),
           },
         }),
       },

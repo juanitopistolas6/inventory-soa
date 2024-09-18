@@ -11,13 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import { messagesCustomer } from './types'
-import { AuthGuard } from './guards/auth.guard'
-import { GetUser } from './decorators/get-user'
-import { UpdatePassword, UserDto } from './dto'
+import { messagesCustomer } from '../types'
+import { AuthGuard } from '../guards/auth.guard'
+import { GetUser } from '../decorators/get-user'
+import { UpdatePassword, UserDto } from '../dto'
 import { firstValueFrom } from 'rxjs'
-import { IResponse, User } from './interfaces'
-import { Authorization } from './decorators'
+import { IResponse, User } from '../interfaces'
+import { Authorization } from '../decorators'
 
 @Controller('user')
 @UseGuards(AuthGuard)

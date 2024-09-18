@@ -9,7 +9,7 @@ export interface IProductSqueme extends mongoose.Document {
   category: string
   price: string
   suplier: string
-  units: string
+  units: number
 }
 
 export const productSchema = new Schema({

@@ -6,11 +6,11 @@ import {
   Inject,
   Post,
 } from '@nestjs/common'
-import { CredentialsDto } from './dto'
+import { CredentialsDto } from '../dto'
 import { firstValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
-import { MessagesAuth } from './types'
-import { IResponse, token } from './interfaces'
+import { MessagesAuth } from '../types'
+import { IResponse, token } from '../interfaces'
 
 @Controller('auth')
 export class AuthController {

@@ -4,6 +4,7 @@ import { ProductService, SomeService } from './services'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { productSchema } from './models/product'
+import { ClientsModule } from '@nestjs/microservices'
 
 @Module({
   imports: [
@@ -15,6 +16,19 @@ import { productSchema } from './models/product'
         uri: configService.get<string>('MONGO_URI'),
       }),
     }),
+    ClientsModule.registerAsync([
+      {
+        name: 'ORDER_SERVICE',
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          options: {
+            host: 'localhost',
+            port: configService.get<number>('ORDER_PORT'),
+          },
+        }),
+      },
+    ]),
     MongooseModule.forFeature([{ name: 'Product', schema: productSchema }]),
   ],
   controllers: [ProductController],

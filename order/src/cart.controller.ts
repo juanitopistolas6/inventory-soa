@@ -56,7 +56,7 @@ export class CartController {
     }
   }
 
-  @MessagePattern(CART_MESSAGES.ADD_CART)
+  @MessagePattern(CART_MESSAGES.REMOVE_CART)
   async removeItem(removeParams: {
     id: string
     product: IProductSqueme
