@@ -37,7 +37,7 @@ export class SomeService {
     error = false,
   }: FormateDataParams<D>): Promise<IResponse<D>> {
     return {
-      status,
+      status: error ? HttpStatus.BAD_REQUEST : status,
       message,
       data: error ? null : data,
     }

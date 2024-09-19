@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model, startSession } from 'mongoose'
+import { Model, startSession, isValidObjectId } from 'mongoose'
 import { IProductObject, IProductParam } from '../interfaces'
 import { IProductSqueme } from '../models/product'
 
@@ -21,7 +21,7 @@ export class ProductService {
   async Product(id: string) {
     const productFound = await this.productModel.findOne({ _id: id })
 
-    if (!productFound) throw new NotFoundException()
+    if (!productFound) throw new NotFoundException('Product not found')
 
     return productFound
   }
@@ -32,6 +32,11 @@ export class ProductService {
 
   async selectedProducts(ids: string[]) {
     try {
+      if (!ids.every((id) => isValidObjectId(id)))
+        throw new BadRequestException(
+          'One or more invalid MongoDB IDs provided',
+        )
+
       return await this.productModel.find({ _id: { $in: ids } })
     } catch (e) {
       throw new NotFoundException(e.message)

@@ -2,7 +2,12 @@ import { Module } from '@nestjs/common'
 import { ClientsModule, Transport } from '@nestjs/microservices'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AuthGuard } from './guards/auth.guard'
-import { AuthController, UserController } from './controllers'
+import {
+  AuthController,
+  UserController,
+  CartController,
+  ProductController,
+} from './controllers'
 
 @Module({
   imports: [
@@ -35,8 +40,27 @@ import { AuthController, UserController } from './controllers'
         }),
       },
     ]),
+    ClientsModule.registerAsync([
+      {
+        name: 'PRODUCT_SERVICE',
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: 'localhost',
+            port: configService.get<number>('PRODUCT_PORT'),
+          },
+        }),
+      },
+    ]),
   ],
-  controllers: [UserController, AuthController],
+  controllers: [
+    UserController,
+    AuthController,
+    CartController,
+    ProductController,
+  ],
   providers: [AuthGuard],
 })
 export class AppModule {}

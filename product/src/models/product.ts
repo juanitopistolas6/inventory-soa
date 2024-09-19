@@ -7,7 +7,7 @@ export interface IProductSqueme extends mongoose.Document {
   name: string
   banner: string
   category: string
-  price: string
+  price: number
   suplier: string
   units: number
 }

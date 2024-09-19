@@ -2,7 +2,7 @@ export interface IProductParam {
   name: string
   banner: string
   category: string
-  price: number
+  price: string
   suplier: string
   units: number
 }

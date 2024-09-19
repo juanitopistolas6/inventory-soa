@@ -7,18 +7,23 @@ import {
   HttpStatus,
   Inject,
   Put,
+  UseGuards,
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
 import { Authorization, GetUser } from 'src/decorators'
 import { ProductPayloadDto } from 'src/dto'
+import { AuthGuard } from 'src/guards/auth.guard'
 import { IResponse } from 'src/interfaces'
 import { ICart } from 'src/interfaces/cart'
 import { CART_MESSAGES } from 'src/types'
 
 @Controller('cart')
+@UseGuards(AuthGuard)
 export class CartController {
-  constructor(@Inject('SHOPPING_SERICE') private shoppingClient: ClientProxy) {}
+  constructor(
+    @Inject('SHOPPING_SERVICE') private shoppingClient: ClientProxy,
+  ) {}
 
   @Get()
   @Authorization(true)

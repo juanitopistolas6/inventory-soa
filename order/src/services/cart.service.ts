@@ -17,7 +17,7 @@ export class CartService {
     try {
       const cart = await this.cartModel.findOne({ idCustomer: id })
 
-      if (!cart) throw new NotFoundException()
+      if (!cart) throw new NotFoundException('Cart not found.')
 
       return cart
     } catch (e) {
