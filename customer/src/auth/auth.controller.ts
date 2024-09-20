@@ -52,35 +52,42 @@ export class AuthController {
 
   @MessagePattern(MessagesAuth.LOGIN)
   async login(userDto: LoginUserDto): Promise<IResponse<token>> {
-    const user = await this.authService.findUser(userDto.user)
+    try {
+      const user = await this.authService.findUser(userDto.user)
 
-    const isUser = await this.someService.VerifyPassword(
-      userDto.password,
-      user.password,
-      user.salt,
-    )
+      const isUser = await this.someService.VerifyPassword(
+        userDto.password,
+        user.password,
+        user.salt,
+      )
 
-    if (!user || !isUser)
-      return await this.someService.FormateData<null>({
-        error: true,
-        message: 'NOT_FOUND_ERROR',
-        status: HttpStatus.NOT_FOUND,
+      if (!isUser)
+        return await this.someService.FormateData<null>({
+          error: true,
+          message: 'NOT_FOUND_ERROR',
+          status: HttpStatus.NOT_FOUND,
+        })
+
+      const token = await this.someService.GenerateSignature({
+        id: user._id,
+        user: user.user,
+        name: user.name,
+        type: user.type,
       })
 
-    const token = await this.someService.GenerateSignature({
-      id: user._id,
-      user: user.user,
-      name: user.name,
-      type: user.type,
-    })
-
-    return await this.someService.FormateData<token>({
-      data: {
-        id: user._id,
-        token,
-      },
-      message: 'LOGIN_TOKEN_GENERATED',
-    })
+      return await this.someService.FormateData<token>({
+        data: {
+          id: user._id,
+          token,
+        },
+        message: 'LOGIN_TOKEN_GENERATED',
+      })
+    } catch (e) {
+      return await this.someService.FormateData({
+        error: true,
+        message: e.message,
+      })
+    }
   }
 
   @MessagePattern(MessagesAuth.VERIFY_TOKEN)

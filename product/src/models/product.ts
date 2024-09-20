@@ -12,12 +12,21 @@ export interface IProductSqueme extends mongoose.Document {
   units: number
 }
 
-export const productSchema = new Schema({
-  name: { type: String },
-  description: { type: String },
-  banner: { type: String },
-  category: { type: String },
-  price: { type: Number },
-  suplier: { type: String },
-  units: { type: Number },
-})
+export const productSchema = new Schema(
+  {
+    name: { type: String },
+    description: { type: String },
+    banner: { type: String },
+    category: { type: String },
+    price: { type: Number },
+    suplier: { type: String },
+    units: { type: Number },
+  },
+  {
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.__v
+      },
+    },
+  },
+)

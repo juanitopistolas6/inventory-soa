@@ -45,7 +45,7 @@ export class CartService {
         await this.cartModel.updateOne(
           {
             idCustomer: id,
-            'cart.product.id': product.product._id,
+            'cart.product._id': product.product._id,
           },
           { $set: { 'cart.$.units': itemFound.units + product.units } },
         )
@@ -67,7 +67,7 @@ export class CartService {
         await this.cartModel.updateOne(
           {
             idCustomer: id,
-            'cart.product.id': product.product._id,
+            'cart.product._id': product.product._id,
           },
           { $pull: { cart: { 'product._id': itemFound.product._id } } },
         )
@@ -75,7 +75,7 @@ export class CartService {
         await this.cartModel.updateOne(
           {
             idCustomer: id,
-            'cart.product.id': product.product._id,
+            'cart.product._id': product.product._id,
           },
           { $set: { 'cart.$.units': unitsToUpdate } },
         )

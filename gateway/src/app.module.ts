@@ -8,6 +8,7 @@ import {
   CartController,
   ProductController,
 } from './controllers'
+import { OrderContoller } from './controllers/order.controller'
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import {
     AuthController,
     CartController,
     ProductController,
+    OrderContoller,
   ],
   providers: [AuthGuard],
 })
