@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model, startSession, isValidObjectId } from 'mongoose'
+import { Model, isValidObjectId } from 'mongoose'
 import { IProductObject, IProductParam } from '../interfaces'
 import { IProductSqueme } from '../models/product'
 
@@ -66,11 +66,11 @@ export class ProductService {
   }
 
   async processOrder(products: IProductObject[]) {
-    const session = await startSession()
-
-    session.startTransaction()
+    const session = await this.productModel.db.startSession()
 
     try {
+      session.startTransaction()
+
       for (const item of products) {
         const { product, units } = item
 
@@ -78,20 +78,22 @@ export class ProductService {
           .findOne({ _id: product._id })
           .session(session)
 
+        console.log('Product found:', productFound)
+
         if (!productFound)
           throw new NotFoundException(`Product ${product._id} was not found`)
 
         if (units > productFound.units)
           throw new BadRequestException('Insufficient units available')
 
-        await productFound.updateOne({ $inc: { units: -units } })
+        await productFound.updateOne({ $inc: { units: -units } }, { session })
       }
 
       await session.commitTransaction()
     } catch {
       await session.abortTransaction()
     } finally {
-      session.endSession()
+      await session.endSession()
     }
   }
 }

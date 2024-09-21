@@ -11,18 +11,18 @@ import {
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
-import { Authorization, GetUser } from 'src/decorators'
-import { ProductPayloadDto } from 'src/dto'
-import { AuthGuard } from 'src/guards/auth.guard'
-import { IResponse } from 'src/interfaces'
-import { ICart } from 'src/interfaces/cart'
-import { CART_MESSAGES } from 'src/types'
+import { Authorization, GetUser } from '../decorators'
+import { ManageCartDto } from '../dto/manageCart.dto'
+import { AuthGuard } from '../guards/auth.guard'
+import { IResponse, ICart } from '../interfaces'
+import { CART_MESSAGES, PRODUCT_MESSAGES } from '../types'
 
 @Controller('cart')
 @UseGuards(AuthGuard)
 export class CartController {
   constructor(
     @Inject('SHOPPING_SERVICE') private shoppingClient: ClientProxy,
+    @Inject('PRODUCT_SERVICE') private productClient: ClientProxy,
   ) {}
 
   @Get()
@@ -40,9 +40,18 @@ export class CartController {
 
   @Put()
   @Authorization(true)
-  async addItem(@GetUser('id') id: string) {
+  async addToCart(
+    @GetUser('_id') idClient: string,
+    @Body() manageCartDto: ManageCartDto,
+  ) {
+    const { id, units } = manageCartDto
+
     const cartResponse: IResponse<ICart> = await firstValueFrom(
-      this.shoppingClient.send(CART_MESSAGES.ADD_CART, { id }),
+      this.productClient.send(PRODUCT_MESSAGES.ADD_CART, {
+        idClient,
+        id,
+        units,
+      }),
     )
 
     if (cartResponse.status !== HttpStatus.OK)
@@ -53,14 +62,17 @@ export class CartController {
 
   @Delete()
   @Authorization(true)
-  async removeItem(
-    @GetUser('id') id: string,
-    @Body() productPayload: ProductPayloadDto,
+  async removeFromCart(
+    @GetUser('_id') idClient: string,
+    @Body() manageCartDto: ManageCartDto,
   ) {
+    const { id, units } = manageCartDto
+
     const cartResponse: IResponse<ICart> = await firstValueFrom(
-      this.shoppingClient.send(CART_MESSAGES.REMOVE_CART, {
+      this.productClient.send(PRODUCT_MESSAGES.REMOVE_FROM_CART, {
         id,
-        productPayload,
+        units,
+        idClient,
       }),
     )
 

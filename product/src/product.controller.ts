@@ -1,4 +1,9 @@
-import { Controller, HttpStatus, Inject } from '@nestjs/common'
+import {
+  BadRequestException,
+  Controller,
+  HttpStatus,
+  Inject,
+} from '@nestjs/common'
 import { ProductService } from './services/product.service'
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
 import { CART_MESSAGES, PRODUCT_MESSAGES } from './types'
@@ -168,6 +173,9 @@ export class ProductController {
         })
 
       const { cart: cartObject } = cart.data
+
+      if (cartObject.length === 0)
+        throw new BadRequestException('Cart is empty')
 
       await this.productService.processOrder(cartObject)
 
