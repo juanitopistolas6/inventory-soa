@@ -1,22 +1,53 @@
 import {
   BadRequestException,
   Controller,
+  Get,
   HttpStatus,
   Inject,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
-import { Authorization, GetUser } from 'src/decorators'
-import { AuthGuard } from 'src/guards/auth.guard'
+import { Authorization, GetUser } from '../decorators'
+import { AuthGuard } from '../guards/auth.guard'
 import { IResponse, IOrder } from '../interfaces'
-import { PRODUCT_MESSAGES } from 'src/types/product-service'
+import { PRODUCT_MESSAGES, ORDER_MESSAGES } from '../types'
 
 @Controller('order')
 @UseGuards(AuthGuard)
 export class OrderContoller {
-  constructor(@Inject('PRODUCT_SERVICE') private productClient: ClientProxy) {}
+  constructor(
+    @Inject('PRODUCT_SERVICE') private productClient: ClientProxy,
+    @Inject('SHOPPING_SERVICE') private shoppingClient: ClientProxy,
+  ) {}
+
+  @Get()
+  @Authorization(true)
+  async getOrders(@GetUser('_id') id: string) {
+    const orderResponse: IResponse<IOrder[]> = await firstValueFrom(
+      this.shoppingClient.send(ORDER_MESSAGES.GET_ORDERS, { id }),
+    )
+
+    if (orderResponse.status !== HttpStatus.OK)
+      throw new BadRequestException(orderResponse.message)
+
+    return orderResponse
+  }
+
+  @Get(':id')
+  @Authorization(true)
+  async getOrder(@Param('id') idOrder: string) {
+    const orderResponse: IResponse<IOrder> = await firstValueFrom(
+      this.shoppingClient.send(ORDER_MESSAGES.GET_ORDER, { idOrder }),
+    )
+
+    if (orderResponse.status !== HttpStatus.OK)
+      throw new BadRequestException(orderResponse.message)
+
+    return orderResponse
+  }
 
   @Post()
   @Authorization(true)

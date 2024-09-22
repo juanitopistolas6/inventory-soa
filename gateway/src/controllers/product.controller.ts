@@ -7,21 +7,36 @@ import {
   Inject,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { AuthGuard } from '../guards/auth.guard'
-import { Authorization } from 'src/decorators'
-import { ProductDto } from 'src/dto/createProduct.dto'
-import { IProduct, IResponse } from 'src/interfaces'
+import { Authorization } from '../decorators'
+import { IProduct, IResponse } from '../interfaces'
 import { firstValueFrom } from 'rxjs'
-import { PRODUCT_MESSAGES } from 'src/types/product-service'
-import { ProductIdsDto } from 'src/dto/productIds.dto'
+import { PRODUCT_MESSAGES } from '../types'
+import { ProductIdsDto, ProductDto, CategoryDto } from '../dto'
 
 @UseGuards(AuthGuard)
 @Controller('product')
 export class ProductController {
   constructor(@Inject('PRODUCT_SERVICE') private productClient: ClientProxy) {}
+
+  @Get('category')
+  @Authorization(true)
+  async byCategory(@Query() categoryDto: CategoryDto) {
+    const { type: category } = categoryDto
+
+    const productResponse: IResponse<IProduct[]> = await firstValueFrom(
+      this.productClient.send(PRODUCT_MESSAGES.PRODUCT_CATEGORY, { category }),
+    )
+
+    if (productResponse.status !== HttpStatus.OK)
+      throw new BadRequestException(productResponse.status)
+
+    return productResponse
+  }
 
   @Get()
   @Authorization(true)

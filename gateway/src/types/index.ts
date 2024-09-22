@@ -1,3 +1,5 @@
 export * from './message_services'
 export * from './cart-services'
 export * from './product-service'
+export * from './order-messages'
+export * from './category-enum'

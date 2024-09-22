@@ -97,7 +97,7 @@ export class ProductController {
 
       return await this.someService.FormateData<IProduct[]>({
         data: products,
-        message: 'PRODUCTS_FOUND',
+        message: 'CATEGORY_FOUND',
       })
     } catch (e) {
       return await this.someService.FormateData({

@@ -56,8 +56,6 @@ export class OrderController {
   }): Promise<IResponse<IOrder>> {
     const { customerId } = orderParams
 
-    console.log(customerId)
-
     try {
       const order = await this.orderService.CreateOrder(customerId)
 

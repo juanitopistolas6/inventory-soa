@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString, IsUrl } from 'class-validator'
+import { IsEnum, IsNotEmpty, IsNumber, IsString, IsUrl } from 'class-validator'
+import { ProductCategory } from '../types'
 
 export class ProductDto {
   @IsNotEmpty()
@@ -10,8 +11,8 @@ export class ProductDto {
   banner: string
 
   @IsNotEmpty()
-  @IsString()
-  category: string
+  @IsEnum(ProductCategory)
+  category: ProductCategory
 
   @IsNotEmpty()
   @IsNumber()
