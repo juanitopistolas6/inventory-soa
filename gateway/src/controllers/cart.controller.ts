@@ -12,7 +12,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
 import { Authorization, GetUser } from '../decorators'
-import { ManageCartDto } from '../dto/manageCart.dto'
+import { ManageCartDto } from '../dto'
 import { AuthGuard } from '../guards/auth.guard'
 import { IResponse, ICart } from '../interfaces'
 import { CART_MESSAGES, PRODUCT_MESSAGES } from '../types'

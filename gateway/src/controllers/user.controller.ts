@@ -13,11 +13,10 @@ import {
 import { ClientProxy } from '@nestjs/microservices'
 import { messagesCustomer } from '../types'
 import { AuthGuard } from '../guards/auth.guard'
-import { GetUser } from '../decorators/get-user'
 import { UpdatePassword, UserDto } from '../dto'
 import { firstValueFrom } from 'rxjs'
 import { IResponse, User } from '../interfaces'
-import { Authorization } from '../decorators'
+import { Authorization, GetUser } from '../decorators'
 
 @Controller('user')
 @UseGuards(AuthGuard)
@@ -52,6 +51,12 @@ export class UserController {
     return customerResponse
   }
 
+  @Get('whoami')
+  @Authorization(false)
+  async whoami() {
+    return { message: 'Your a customer :)' }
+  }
+
   @Put('update-password')
   @Authorization(true)
   async updatePassword(
@@ -74,6 +79,7 @@ export class UserController {
   @Post()
   @Authorization(false)
   async createCustomer(@Body() userObject: UserDto): Promise<IResponse<User>> {
+    console.log('creando pap...')
     const userCreated: IResponse<User> = await firstValueFrom(
       this.customerServiceClient.send(messagesCustomer.REGISTER, userObject),
     )

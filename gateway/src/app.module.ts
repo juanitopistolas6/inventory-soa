@@ -21,7 +21,7 @@ import { OrderContoller } from './controllers/order.controller'
         useFactory: async (configService: ConfigService) => ({
           transport: Transport.TCP,
           options: {
-            host: 'localhost',
+            host: 'clientes',
             port: configService.get<number>('CUSTOMER_PORT'),
           },
         }),
@@ -35,7 +35,7 @@ import { OrderContoller } from './controllers/order.controller'
         useFactory: async (configService: ConfigService) => ({
           transport: Transport.TCP,
           options: {
-            host: 'localhost',
+            host: 'orden',
             port: configService.get<number>('SHOPPING_PORT'),
           },
         }),
@@ -49,7 +49,7 @@ import { OrderContoller } from './controllers/order.controller'
         useFactory: async (configService: ConfigService) => ({
           transport: Transport.TCP,
           options: {
-            host: 'localhost',
+            host: 'producto',
             port: configService.get<number>('PRODUCT_PORT'),
           },
         }),

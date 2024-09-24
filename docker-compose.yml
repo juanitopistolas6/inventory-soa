@@ -1,0 +1,89 @@
+version: '3.8'
+services:
+  mongodata:
+    image: mongo
+    container_name: mongodata
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db:/data/db
+    networks:
+      - my-network
+
+  clientes:
+    build: 
+      dockerfile: Dockerfile
+      context: ./customer
+    restart: on-failure
+    container_name: clientes
+    depends_on:
+      - mongodata
+    ports:
+      - 3001:3001    
+    volumes:
+      - .:/app
+      - /app/customer/node_modules
+    env_file:
+      - ./customer/.env
+    networks:
+      - my-network
+
+  gateway:
+    build: 
+      dockerfile: Dockerfile
+      context: ./gateway
+    restart: on-failure
+    container_name: gateway
+    depends_on:
+      - mongodata
+      - orden
+      - producto
+      - clientes
+    ports:
+      - 3000:3000    
+    volumes:
+      - .:/app
+      - /app/gateway/node_modules
+    env_file:
+      - ./gateway/.env
+    networks:
+      - my-network
+
+  orden:
+    build: 
+      dockerfile: Dockerfile
+      context: ./order
+    restart: on-failure
+    container_name: orden
+    depends_on:
+      - mongodata
+    ports:
+      - 3002:3002    
+    volumes:
+      - .:/app
+      - /app/order/node_modules
+    env_file:
+      - ./order/.env
+    networks:
+      - my-network
+
+  producto:
+    build: 
+      dockerfile: Dockerfile
+      context: ./product
+    restart: on-failure
+    container_name: producto
+    depends_on:
+      - mongodata
+    ports:
+      - 3003:3003    
+    volumes:
+      - .:/app
+      - /app/product/node_modules
+    env_file:
+      - ./product/.env
+    networks:
+      - my-network
+networks:
+  my-network:
+    driver: bridge

@@ -53,6 +53,7 @@ export class AuthController {
   @MessagePattern(MessagesAuth.LOGIN)
   async login(userDto: LoginUserDto): Promise<IResponse<token>> {
     try {
+      console.log(userDto)
       const user = await this.authService.findUser(userDto.user)
 
       const isUser = await this.someService.VerifyPassword(
