@@ -19,7 +19,7 @@ services:
     depends_on:
       - mongodata
     ports:
-      - 3001:3001    
+      - 4005:4005    
     volumes:
       - .:/app
       - /app/customer/node_modules
@@ -58,7 +58,7 @@ services:
     depends_on:
       - mongodata
     ports:
-      - 3002:3002    
+      - 4002:4002    
     volumes:
       - .:/app
       - /app/order/node_modules
@@ -76,7 +76,7 @@ services:
     depends_on:
       - mongodata
     ports:
-      - 3003:3003    
+      - 4003:4003    
     volumes:
       - .:/app
       - /app/product/node_modules
@@ -84,6 +84,7 @@ services:
       - ./product/.env
     networks:
       - my-network
+
 networks:
   my-network:
     driver: bridge

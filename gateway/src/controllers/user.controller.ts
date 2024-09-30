@@ -25,6 +25,12 @@ export class UserController {
     @Inject('CUSTOMER_SERVICE') private customerServiceClient: ClientProxy,
   ) {}
 
+  @Get('whoami')
+  @Authorization(false)
+  whoami() {
+    return { mesage: 'Your a customer :)' }
+  }
+
   @Get()
   @Authorization(true)
   async getAll(): Promise<IResponse<Array<User>>> {
@@ -51,12 +57,6 @@ export class UserController {
     return customerResponse
   }
 
-  @Get('whoami')
-  @Authorization(false)
-  async whoami() {
-    return { message: 'Your a customer :)' }
-  }
-
   @Put('update-password')
   @Authorization(true)
   async updatePassword(
@@ -79,7 +79,6 @@ export class UserController {
   @Post()
   @Authorization(false)
   async createCustomer(@Body() userObject: UserDto): Promise<IResponse<User>> {
-    console.log('creando pap...')
     const userCreated: IResponse<User> = await firstValueFrom(
       this.customerServiceClient.send(messagesCustomer.REGISTER, userObject),
     )

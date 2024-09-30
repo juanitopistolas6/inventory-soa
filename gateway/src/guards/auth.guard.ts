@@ -19,12 +19,9 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const secured = this.reflector.get<string[]>(
-      'secured',
-      context.getHandler(),
-    )
+    const secured = this.reflector.get<boolean>('secured', context.getHandler())
 
-    console.log(secured)
+    console.log(`este endpoint esta asegurado?: ${secured}`)
 
     if (!secured) return true
 
