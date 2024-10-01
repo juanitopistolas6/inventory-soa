@@ -70,8 +70,10 @@ export class ProductService {
 
     try {
       session.startTransaction()
+      console.log('sesion iniciada...')
 
       for (const item of products) {
+        console.log(item.product)
         const { product, units } = item
 
         const productFound = await this.productModel
@@ -87,11 +89,17 @@ export class ProductService {
           throw new BadRequestException('Insufficient units available')
 
         await productFound.updateOne({ $inc: { units: -units } }, { session })
+
+        console.log('producto actualizado')
       }
 
       await session.commitTransaction()
-    } catch {
+    } catch (err) {
+      console.log('hubo un error jefe')
+
       await session.abortTransaction()
+
+      throw err
     } finally {
       await session.endSession()
     }

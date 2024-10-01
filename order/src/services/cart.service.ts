@@ -35,7 +35,7 @@ export class CartService {
     if (!cart) return await this.CreateCart(id, product)
 
     const itemFound = cart.cart.find(
-      (product) => product.product._id.toString() === product.product._id,
+      (producto) => producto.product._id.toString() === product.product._id,
     )
 
     if (action === manageActions.ADD) {
@@ -51,6 +51,7 @@ export class CartService {
         )
       } else {
         // IF ITEM WAS NOT FOUND
+        console.log('no encontrado!')
         await this.cartModel.updateOne(
           { idCustomer: id },
           { $push: { cart: product } },

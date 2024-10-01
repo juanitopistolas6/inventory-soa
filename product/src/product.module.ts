@@ -23,7 +23,7 @@ import { ClientsModule } from '@nestjs/microservices'
         inject: [ConfigService],
         useFactory: async (configService: ConfigService) => ({
           options: {
-            host: 'localhost',
+            host: 'orden',
             port: configService.get<number>('ORDER_PORT'),
           },
         }),

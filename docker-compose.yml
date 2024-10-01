@@ -5,6 +5,7 @@ services:
     container_name: mongodata
     ports:
       - 27017:27017
+    command: ["--replSet", "rs0"]
     volumes:
       - ./db:/data/db
     networks:
