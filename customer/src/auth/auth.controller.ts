@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { MessagesAuth } from '../types'
 import { IResponse, token, User } from '../interfaces'
+import { ITokenUser } from 'src/interfaces/token-user'
 
 @Controller('auth')
 export class AuthController {
@@ -51,7 +52,7 @@ export class AuthController {
   }
 
   @MessagePattern(MessagesAuth.LOGIN)
-  async login(userDto: LoginUserDto): Promise<IResponse<token>> {
+  async login(userDto: LoginUserDto): Promise<IResponse<ITokenUser>> {
     try {
       console.log(userDto)
       const user = await this.authService.findUser(userDto.user)
@@ -76,9 +77,9 @@ export class AuthController {
         type: user.type,
       })
 
-      return await this.someService.FormateData<token>({
+      return await this.someService.FormateData<ITokenUser>({
         data: {
-          id: user._id,
+          user,
           token,
         },
         message: 'LOGIN_TOKEN_GENERATED',

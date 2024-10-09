@@ -1,4 +1,5 @@
 import { type HttpStatus } from '@nestjs/common'
+import { User } from './user'
 
 export interface IResponse<T> {
   status: HttpStatus
@@ -8,5 +9,5 @@ export interface IResponse<T> {
 
 export interface token {
   token: string
-  id: string
+  user: User
 }
